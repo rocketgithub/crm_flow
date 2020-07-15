@@ -17,6 +17,8 @@
     'depends': ['crm','mail'],
 
     'data': [
+        'views/mail_activity_views.xml',
+        'views/crm_views.xml',
     ],
     'qweb': [
     ],
