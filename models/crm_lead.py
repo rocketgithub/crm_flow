@@ -28,8 +28,6 @@ class Lead(models.Model):
             if rec.activity_type_id.delay_from == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
                 base = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
             rec.date_deadline = base + relativedelta(**{rec.activity_type_id.delay_unit: rec.activity_type_id.delay_count})
-            
-            logging.getLogger('ACAAAAA---0').warn(rec.date_deadline)
             activity_ins = activity.create(
             {
             'res_id': oportunidad.id,
