@@ -1,6 +1,26 @@
 <?xml version="1.0"?>
 <odoo>
 
+    <record id="crm_flow_mail_activity_type_view_form" model="ir.ui.view">
+        <field name="name">crm_flow.mail.activity.type.view.form</field>
+        <field name="model">mail.activity.type</field>
+        <field name="inherit_id" ref="mail.mail_activity_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/group" position="inside">
+                <group>
+                    <label for="fecha_sugerida_count"/>
+                    <div>
+                        <div class="o_row">
+                            <field name="fecha_sugerida_count"/>
+                            <field name="fecha_sugerida_unit"/>
+                        </div>
+                        <field name="fecha_sugerida_from"/>
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
     <record id="crm_flow_mail_activity_view_form_popup" model="ir.ui.view">
         <field name="name">crm.flow.mail.activity.view.form.popup</field>
         <field name="model">mail.activity</field>
@@ -12,6 +32,4 @@
             </field>
         </field>
     </record>
-
-
 </odoo>
