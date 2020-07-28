@@ -51,12 +51,18 @@ class MailActivity(models.Model):
             # Date.context_today is correct because date_deadline is a Date and is meant to be
             # expressed in user TZ
             base = fields.Date.context_today(self)
+            base_fecha_sugerida = fields.Date.context_today(self)
 
             if self.activity_type_id.delay_from == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
                 base = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
 
+            if self.activity_type_id.fecha_sugerida_from  == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
+                base_fecha_sugerida = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
+
+
             if self.activity_type_id.delay_unit != 'horas':
                 self.date_deadline = base + relativedelta(**{self.activity_type_id.delay_unit: self.activity_type_id.delay_count})
+                self.fecha_sugerida = base_fecha_sugerida + relativedelta(**{self.activity_type_id.fecha_sugerida_unit: self.activity_type_id.fecha_sugerida_count})
             else:
 
 
@@ -65,17 +71,24 @@ class MailActivity(models.Model):
 
                 hoy = fields.Datetime.context_timestamp(self, timestamp=datetime.now())
                 # hora_actual = hoy.strftime('%H:%M')
-                logging.warn(hoy)
                 hora_limite = hoy+relativedelta(hours=+self.activity_type_id.delay_count)
-                logging.warn('HOR LIMITE')
-                logging.warn(hora_limite)
+                hora_fecha_limite = hoy+relativedelta(hours=+self.activity_type_id.fecha_sugerida_count)
+
                 hora = hora_limite.strftime('%H')
+                hora_limite = hora_fecha_limite.strftime('%H')
+
                 minuto = hora_limite.strftime('%M')
-                logging.warn(hora_limite)
+                minuto_limite = hora_fecha_limite.strftime('%M')
+
                 hora_final = int(hora) + int(minuto)/60
+                hora_final_limite = int(hora_limite) + int(minuto_limite)/60
+
 
                 self.date_deadline = hora_limite.strftime('%Y-%m-%d')
                 self.hora = float(hora_final)
+
+
+                self.fecha_sugerida = hora_final_limite.strftime('%Y-%m-%d')
 
             self.user_id = self.activity_type_id.default_user_id or self.env.user
             if self.activity_type_id.default_description:
