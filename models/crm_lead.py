@@ -17,6 +17,12 @@ from . import crm_stage
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
+    @api.model
+    def create(self, vals):
+        rec = super().create(vals)
+        rec._onchange_stage_id()
+        return rec
+
     @api.onchange('stage_id')
     def _onchange_stage_id(self):
         for rec in self:
@@ -25,18 +31,14 @@ class Lead(models.Model):
             model_id = self.env['ir.model'].search([('model','=','crm.lead')])
 
             base = fields.Date.context_today(rec)
-            if rec.activity_type_id.delay_from == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
-                base = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
-            rec.date_deadline = base + relativedelta(**{rec.activity_type_id.delay_unit: rec.activity_type_id.delay_count})
-
-            logging.getLogger('ACAAAAA---0').warn(rec.date_deadline)
+            date_deadline = base + relativedelta(**{rec.stage_id.actividad_inicial.delay_unit: rec.stage_id.actividad_inicial.delay_count})
             activity_ins = activity.create(
             {
             'res_id': oportunidad.id,
             'res_model_id': model_id.id,
             'res_model':model_id.name,
             'activity_type_id':rec.stage_id.actividad_inicial.id,
-            'date_deadline':  rec.date_deadline,
+            'date_deadline':  date_deadline,
             'user_id': rec.user_id.id
             })
 
