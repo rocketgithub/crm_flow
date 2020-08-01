@@ -52,6 +52,7 @@ class MailActivity(models.Model):
             # expressed in user TZ
             base = fields.Date.context_today(self)
             base_fecha_sugerida = fields.Date.context_today(self)
+            hoy = fields.Datetime.context_timestamp(self, timestamp=datetime.now())
 
             if self.activity_type_id.delay_from == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
                 base = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
@@ -59,36 +60,26 @@ class MailActivity(models.Model):
             if self.activity_type_id.fecha_sugerida_from  == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
                 base_fecha_sugerida = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
 
+            if self.activity_type_id.fecha_sugerida_unit != 'horas':
+                self.fecha_sugerida = base_fecha_sugerida + relativedelta(**{self.activity_type_id.fecha_sugerida_unit: self.activity_type_id.fecha_sugerida_count})
+            else:
+                hora_fecha_limite = hoy+relativedelta(hours=+self.activity_type_id.fecha_sugerida_count)
+                hora_final = hora_fecha_limite.strftime('%H')
+                minuto_final = hora_fecha_limite.strftime('%M')
+                # hora_final_limite = int(hora_limite) + int(minuto_limite)/60
+                self.fecha_sugerida = hora_fecha_limite.strftime('%Y-%m-%d')
+
 
             if self.activity_type_id.delay_unit != 'horas':
                 self.date_deadline = base + relativedelta(**{self.activity_type_id.delay_unit: self.activity_type_id.delay_count})
-                self.fecha_sugerida = base_fecha_sugerida + relativedelta(**{self.activity_type_id.fecha_sugerida_unit: self.activity_type_id.fecha_sugerida_count})
             else:
-
-
-                # self.date_deadline = base
-
-
-                hoy = fields.Datetime.context_timestamp(self, timestamp=datetime.now())
                 # hora_actual = hoy.strftime('%H:%M')
                 hora_limite = hoy+relativedelta(hours=+self.activity_type_id.delay_count)
-                hora_fecha_limite = hoy+relativedelta(hours=+self.activity_type_id.fecha_sugerida_count)
-
                 hora = hora_limite.strftime('%H')
-                hora_limite = hora_fecha_limite.strftime('%H')
-
                 minuto = hora_limite.strftime('%M')
-                minuto_limite = hora_fecha_limite.strftime('%M')
-
                 hora_final = int(hora) + int(minuto)/60
-                hora_final_limite = int(hora_limite) + int(minuto_limite)/60
-
-
                 self.date_deadline = hora_limite.strftime('%Y-%m-%d')
                 self.hora = float(hora_final)
-
-
-                self.fecha_sugerida = hora_final_limite.strftime('%Y-%m-%d')
 
             self.user_id = self.activity_type_id.default_user_id or self.env.user
             if self.activity_type_id.default_description:

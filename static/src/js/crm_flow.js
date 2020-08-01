@@ -48,49 +48,25 @@ var setDelayLabel = function (activities){
         var horas = activity.hora;
         var texto_horas = "";
         var hora_convertida = "";
-        // console.log('DIF')
-        // console.log(diff)
-        // console.log('ACTIVITY')
-        // console.log(activity)
-        //
-        //
-        // console.log('HORA ACTUAL')
+
 
         var today = new Date();
         var hora = today.getHours();
         var minuto = today.getMinutes();
         var horasRestantes = false;
 
-        // console.log(today)
-        // console.log(hora)
-        // console.log(minuto)
-
 
         if (horas >= 1){
-            // var dateString = hora_convertida
-            // var date = new Date(dateString);
             var hora_convertida = float_to_hour(horas);
             var timeStart = activity.date_deadline._d;
             var horaTimeStart = hora_convertida.toString().split('.')[0];
             var minutoTimeStart = hora_convertida.toString().split('.')[1];
-            // var horaTimeStart = addy.split(',')[0];
-            // var minutoTimeStart = ;
-            console.log(horaTimeStart)
-            console.log(minutoTimeStart)
             timeStart.setHours(parseInt(horaTimeStart), parseInt(minutoTimeStart));
             var timeEnd = today;
-
-            console.log(timeStart);
-            console.log(timeEnd);
 
             var hourDiff = timeStart - timeEnd;
             var diffHrs = ((hourDiff % 86400000) / 3600000);
 
-
-
-
-            console.log(diffHrs);
-            console.log(float_to_hour(diffHrs))
             horasRestantes = float_to_hour(diffHrs)
             texto_horas = " con "+horasRestantes.toString() +" hora (s)"
         }

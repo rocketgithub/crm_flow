@@ -29,9 +29,38 @@ class Lead(models.Model):
             oportunidad = self.env['crm.lead'].browse(rec._origin.id)
             activity = self.env['mail.activity']
             model_id = self.env['ir.model'].search([('model','=','crm.lead')])
-
+            fecha_limite = False
+            fecha_sugerida = False
+            hora = 0
             base = fields.Date.context_today(rec)
-            date_deadline = base + relativedelta(**{rec.stage_id.actividad_inicial.delay_unit: rec.stage_id.actividad_inicial.delay_count})
+            base_fecha_sugerida =  fields.Date.context_today(rec)
+            hoy = fields.Datetime.context_timestamp(rec, timestamp=datetime.now())
+
+            if rec.stage_id.actividad_inicial.fecha_sugerida_from  == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
+                base_fecha_sugerida = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
+
+
+            if rec.stage_id.actividad_inicial.fecha_sugerida_unit != 'horas':
+                fecha_sugerida = base_fecha_sugerida + relativedelta(**{rec.activity_type_id.fecha_sugerida_unit: rec.activity_type_id.fecha_sugerida_count})
+            else:
+                hora_fecha_limite = hoy+relativedelta(hours=+rec.activity_type_id.fecha_sugerida_count)
+                hora_final = hora_fecha_limite.strftime('%H')
+                minuto_final = hora_fecha_limite.strftime('%M')
+                # hora_final_limite = int(hora_limite) + int(minuto_limite)/60
+                fecha_sugerida = hora_fecha_limite.strftime('%Y-%m-%d')
+
+
+            if rec.stage_id.actividad_inicial.delay_unit != 'horas':
+                date_deadline = base + relativedelta(**{rec.stage_id.actividad_inicial.delay_unit: rec.stage_id.actividad_inicial.delay_count})
+            else:
+                hora_limite = hoy+relativedelta(hours=+rec.stage_id.actividad_inicial.delay_count)
+                hora = hora_limite.strftime('%H')
+                minuto = hora_limite.strftime('%M')
+                hora_final = int(hora) + int(minuto)/60
+                date_deadline = hora_limite.strftime('%Y-%m-%d')
+                hora = float(hora_final)
+
+
             activity_ins = activity.create(
             {
             'res_id': oportunidad.id,
@@ -39,6 +68,8 @@ class Lead(models.Model):
             'res_model':model_id.name,
             'activity_type_id':rec.stage_id.actividad_inicial.id,
             'date_deadline':  date_deadline,
+            'hora': hora,
+            'fecha_sugerida': fecha_sugerida,
             'user_id': rec.user_id.id
             })
 
@@ -53,3 +84,4 @@ class Lead(models.Model):
                     posicion_estado_actual = estado_ids.index(oportunidad_id.stage_id.id)
                     logging.warn(posicion_estado_actual)
                     oportunidad_id.write({'stage_id': estado_ids[posicion_estado_actual+1]})
+                    oportunidad_id._onchange_stage_id()
