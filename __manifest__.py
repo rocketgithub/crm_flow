@@ -14,12 +14,14 @@
     'category': 'Uncategorized',
     'version': '0.1',
 
-    'depends': ['crm','mail'],
+    'depends': ['base','crm','mail'],
 
     'data': [
         'views/mail_activity_views.xml',
         'views/crm_views.xml',
+        'views/templates.xml',
     ],
     'qweb': [
+        'static/src/xml/crm_flow.xml'
     ],
 }
