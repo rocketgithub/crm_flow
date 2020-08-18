@@ -22,6 +22,7 @@ class MailActivityType(models.Model):
 
     fecha_sugerida_count = fields.Integer(
         'Fecha de inicio sugerida', default=0)
+        
     fecha_sugerida_unit = fields.Selection([
         ('days', 'days'),
         ('weeks', 'weeks'),
@@ -31,4 +32,15 @@ class MailActivityType(models.Model):
         ('current_date', 'después de la fecha de validación'),
         ('previous_activity', 'después de la fecha límite de actividad anterior')], string="Delay Type", default='previous_activity')
 
+    plantillas_ids = fields.One2many('mail.activity.type.line', 'activity_type_id', string='Listado de plantillas')
+    
 
+class MailActivityTypeLine(models.Model):
+    _name = 'mail.activity.type.line'
+    _description = "Plantilla"
+    
+    activity_type_id = fields.Many2one('mail.activity.type', string='Activity type')
+    filter_domain = fields.Char(string='Dominio')
+    plantilla_id = fields.Many2one('mail.template', string='Plantilla')
+    
+    

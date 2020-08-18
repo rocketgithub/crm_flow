@@ -19,6 +19,7 @@
     'data': [
         'views/mail_activity_views.xml',
         'views/crm_views.xml',
+        'data/base_automation.xml',
     ],
     'qweb': [
     ],

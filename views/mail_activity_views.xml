@@ -17,8 +17,23 @@
                         <field name="fecha_sugerida_from"/>
                     </div>
                 </group>
+                
+                <field name="plantillas_ids">
+                    <tree>
+                        <field name="filter_domain" options="{'model': 'crm.lead', 'in_dialog': True}"/>
+                        <field name="plantilla_id"/>
+                    </tree>
+                    <form>
+                        <group>
+                            <field name="filter_domain" widget="domain" options="{'model': 'crm.lead', 'in_dialog': True}"/>
+                            <field name="plantilla_id"/>
+                        </group>
+                    </form>
+                </field>
+
             </xpath>
         </field>
     </record>
 
+ 
 </odoo>
