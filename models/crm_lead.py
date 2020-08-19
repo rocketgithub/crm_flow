@@ -11,12 +11,19 @@ from odoo.exceptions import UserError, AccessError
 from odoo.addons.phone_validation.tools import phone_validation
 from collections import OrderedDict, defaultdict
 
+from odoo.tools.safe_eval import safe_eval
 from . import crm_stage
 
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
+    tipo_interes_id = fields.Many2one('product.template', string='Tipo de interés')
+    
+    def eval_dominio(self, dominio):
+        domain = safe_eval(dominio)
+        return domain
+    
     @api.model
     def create(self, vals):
         rec = super().create(vals)
@@ -85,3 +92,4 @@ class Lead(models.Model):
                     logging.warn(posicion_estado_actual)
                     oportunidad_id.write({'stage_id': estado_ids[posicion_estado_actual+1]})
                     oportunidad_id._onchange_stage_id()
+
