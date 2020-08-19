@@ -20,9 +20,6 @@ class Lead(models.Model):
     @api.model
     def create(self, vals):
         rec = super(Lead, self).create(vals)
-        # logging.warn(vals)
-        # logging.warn(rec)
-
         rec._onchange_stage_crm_id()
         return rec
 
