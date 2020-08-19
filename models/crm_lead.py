@@ -19,13 +19,17 @@ class Lead(models.Model):
 
     @api.model
     def create(self, vals):
-        rec = super().create(vals)
-        rec._onchange_stage_id()
+        rec = super(Lead, self).create(vals)
+        # logging.warn(vals)
+        # logging.warn(rec)
+
+        rec._onchange_stage_crm_id()
         return rec
 
     @api.onchange('stage_id')
-    def _onchange_stage_id(self):
+    def _onchange_stage_crm_id(self):
         for rec in self:
+            logging.warn('entra a onchange')
             oportunidad = self.env['crm.lead'].browse(rec._origin.id)
             activity = self.env['mail.activity']
             model_id = self.env['ir.model'].search([('model','=','crm.lead')])
@@ -35,7 +39,7 @@ class Lead(models.Model):
             base = fields.Date.context_today(rec)
             base_fecha_sugerida =  fields.Date.context_today(rec)
             hoy = fields.Datetime.context_timestamp(rec, timestamp=datetime.now())
-
+            date_deadline = False
             if rec.stage_id.actividad_inicial.fecha_sugerida_from  == 'previous_activity' and 'activity_previous_deadline' in self.env.context:
                 base_fecha_sugerida = fields.Date.from_string(self.env.context.get('activity_previous_deadline'))
 
@@ -50,7 +54,7 @@ class Lead(models.Model):
                 fecha_sugerida = hora_fecha_limite.strftime('%Y-%m-%d')
 
 
-            if rec.stage_id.actividad_inicial.delay_unit != 'horas':
+            if rec.stage_id.actividad_inicial and rec.stage_id.actividad_inicial.delay_unit != 'horas':
                 date_deadline = base + relativedelta(**{rec.stage_id.actividad_inicial.delay_unit: rec.stage_id.actividad_inicial.delay_count})
             else:
                 hora_limite = hoy+relativedelta(hours=+rec.stage_id.actividad_inicial.delay_count)
@@ -60,7 +64,9 @@ class Lead(models.Model):
                 date_deadline = hora_limite.strftime('%Y-%m-%d')
                 hora = float(hora_final)
 
-
+            # logging.warn('a crear')
+            # logging.warn(date_deadline)
+            # logging.warn(fecha_sugerida)
             activity_ins = activity.create(
             {
             'res_id': oportunidad.id,
@@ -83,5 +89,7 @@ class Lead(models.Model):
                 if estado_ids:
                     posicion_estado_actual = estado_ids.index(oportunidad_id.stage_id.id)
                     logging.warn(posicion_estado_actual)
-                    oportunidad_id.write({'stage_id': estado_ids[posicion_estado_actual+1]})
-                    oportunidad_id._onchange_stage_id()
+                    if len(estado_ids) > 0 and oportunidad_id.stage_id.is_won == False:
+                        logging.warn(posicion_estado_actual)
+                        oportunidad_id.write({'stage_id': estado_ids[posicion_estado_actual+1]})
+                        oportunidad_id._onchange_stage_crm_id()
