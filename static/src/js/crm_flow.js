@@ -34,6 +34,9 @@ var setDelayLabel = function (activities,tipos_actividades){
         var texto_horas = "";
         var ahora = new Date();
         var horasRestantes = false;
+        var dias = 0;
+        var horas = 0;
+        var minutos = 0;
 
         activity['end_date'] = activity.create_date._i //Asignamos la fecha inicial a la final para despues sumar horas en caso fuera necesario
         var cantidad_horas = activity.activity_type_id[3]  //Asignamos horas se encuentra en la posición 3 del arreglo
@@ -42,25 +45,27 @@ var setDelayLabel = function (activities,tipos_actividades){
         var fecha_inicio = new Date(activity.create_date._d);    //Convertimos a tipo Fecha para hacer la resta
         var fecha_fin = new Date(activity['end_date']);
 
-        // Obtenemos días, horas, minutos
-        var delta = Math.abs(fecha_fin - ahora) / 1000;
-        var dias = Math.floor(delta / 86400);
-        delta -= dias * 86400;
-        var horas = Math.floor(delta / 3600) % 24;
-        delta -= horas * 3600;
-        var minutos = Math.floor(delta / 60) % 60;
-        delta -= minutos * 60;
+        if (ahora <= fecha_fin){
+            // Obtenemos días, horas, minutos
+            var delta = Math.abs(fecha_fin - ahora) / 1000;
+            dias = Math.floor(delta / 86400);
+            delta -= dias * 86400;
+            horas = Math.floor(delta / 3600) % 24;
+            delta -= horas * 3600;
+            minutos = Math.floor(delta / 60) % 60;
+            delta -= minutos * 60;
+        }
 
-        if (horas >= 1){
+        if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
             // Si existen horas agregamos string necesarios
-            var horasRestantes = horas.toString()+ ' horas y ' + minutos.toString() + ' minutos'
+            var horasRestantes = horas.toString()+ " horas y " + minutos.toString() + " minutos"
             texto_horas = " en "+horasRestantes.toString()
         }
 
         if (diff === 0){
             toDisplay = _t("Today");
 
-            if (horas >= 1){
+            if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                 toDisplay = _t("Today")+_t(texto_horas);
             }
         } else {
@@ -75,7 +80,7 @@ var setDelayLabel = function (activities,tipos_actividades){
                     toDisplay = _t("Tomorrow");
 
 
-                    if (horas >= 1){
+                    if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                         toDisplay = _t("Tomorrow") + _t(texto_horas);
                     }
 
@@ -83,7 +88,7 @@ var setDelayLabel = function (activities,tipos_actividades){
                 } else {
                     toDisplay = _.str.sprintf(_t("Due in %d days"), Math.abs(diff));
 
-                    if (horas >= 1){
+                    if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                         toDisplay = _.str.sprintf(_t("Due in %d days")+_t(texto_horas), Math.abs(diff));
                     }
 
@@ -153,6 +158,7 @@ var Acti = Activity.include({
                 var activities = setFileUploadID(setDelayLabel(actividades,tipos_actividades));
                 if (activities.length) {
                     var nbActivities = _.countBy(activities, 'state');
+                    console.log(nbActivities)
                     $el.html(QWeb.render('mail.activity_items', {
                         uid: session.uid,
                         activities: activities,
