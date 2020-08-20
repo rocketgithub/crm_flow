@@ -2,12 +2,19 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models
 from odoo.tools.translate import _
+from odoo.tools.safe_eval import safe_eval
 from . import crm_stage
 import logging
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
+    tipo_interes_id = fields.Many2one('product.template', string='Tipo de interés')
+    
+    def eval_dominio(self, dominio):
+        domain = safe_eval(dominio)
+        return domain
+    
     @api.model
     def create(self, vals):
         rec = super(Lead, self).create(vals)
