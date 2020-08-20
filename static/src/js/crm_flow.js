@@ -23,6 +23,7 @@ var setDelayLabel = function (activities,tipos_actividades){
 
         // Asigamos delay_unit y delay_count a la activdad que actual
         _.each(tipos_actividades, function (tipo) {
+            console.log(tipo)
             if (activity.activity_type_id[0] == tipo.id){
                 activity.activity_type_id.push(tipo.delay_unit)
                 activity.activity_type_id.push(tipo.delay_count)
@@ -37,6 +38,7 @@ var setDelayLabel = function (activities,tipos_actividades){
         var dias = 0;
         var horas = 0;
         var minutos = 0;
+
 
         activity['end_date'] = activity.create_date._i //Asignamos la fecha inicial a la final para despues sumar horas en caso fuera necesario
         var cantidad_horas = activity.activity_type_id[3]  //Asignamos horas se encuentra en la posición 3 del arreglo
@@ -56,9 +58,11 @@ var setDelayLabel = function (activities,tipos_actividades){
             delta -= minutos * 60;
         }
 
+        console.log(horas)
+        console.log(minutos)
         if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
             // Si existen horas agregamos string necesarios
-            var horasRestantes = horas.toString()+ " horas y " + minutos.toString() + " minutos"
+            var horasRestantes = horas.toString()+ ' horas y ' + minutos.toString() + ' minutos'
             texto_horas = " en "+horasRestantes.toString()
         }
 
@@ -67,6 +71,9 @@ var setDelayLabel = function (activities,tipos_actividades){
 
             if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                 toDisplay = _t("Today")+_t(texto_horas);
+            }else{
+                toDisplay = _t("Vencido");
+                activity.state = "overdue";
             }
         } else {
             if (diff < 0){ // overdue
@@ -80,7 +87,7 @@ var setDelayLabel = function (activities,tipos_actividades){
                     toDisplay = _t("Tomorrow");
 
 
-                    if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
+                    if (activity.activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                         toDisplay = _t("Tomorrow") + _t(texto_horas);
                     }
 
@@ -88,7 +95,7 @@ var setDelayLabel = function (activities,tipos_actividades){
                 } else {
                     toDisplay = _.str.sprintf(_t("Due in %d days"), Math.abs(diff));
 
-                    if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
+                    if (activity.activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                         toDisplay = _.str.sprintf(_t("Due in %d days")+_t(texto_horas), Math.abs(diff));
                     }
 
@@ -98,6 +105,7 @@ var setDelayLabel = function (activities,tipos_actividades){
         }
         activity.label_delay = toDisplay;
     });
+    console.log(activities)
     return activities;
 };
 
@@ -158,6 +166,7 @@ var Acti = Activity.include({
                 var activities = setFileUploadID(setDelayLabel(actividades,tipos_actividades));
                 if (activities.length) {
                     var nbActivities = _.countBy(activities, 'state');
+                    console.log(nbActivities)
                     $el.html(QWeb.render('mail.activity_items', {
                         uid: session.uid,
                         activities: activities,
