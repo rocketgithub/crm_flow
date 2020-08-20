@@ -158,7 +158,6 @@ var Acti = Activity.include({
                 var activities = setFileUploadID(setDelayLabel(actividades,tipos_actividades));
                 if (activities.length) {
                     var nbActivities = _.countBy(activities, 'state');
-                    console.log(nbActivities)
                     $el.html(QWeb.render('mail.activity_items', {
                         uid: session.uid,
                         activities: activities,
