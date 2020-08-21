@@ -76,10 +76,10 @@ class MailActivity(models.Model):
             datos['fecha_sugerida'] = hora_fecha_limite.strftime('%Y-%m-%d')
 
         if activity_type_id.delay_unit != 'horas':
-            datos['date_deadline'] = base + relativedelta(**{self.activity_type_id.delay_unit: self.activity_type_id.delay_count})
+            datos['date_deadline'] = base + relativedelta(**{activity_type_id.delay_unit: activity_type_id.delay_count})
         else:
             # hora_actual = hoy.strftime('%H:%M')
-            hora_limite = hoy+relativedelta(hours=+self.activity_type_id.delay_count)
+            hora_limite = hoy+relativedelta(hours=+activity_type_id.delay_count)
             hora = hora_limite.strftime('%H')
             minuto = hora_limite.strftime('%M')
             datos['date_deadline'] = hora_limite.strftime('%Y-%m-%d')
