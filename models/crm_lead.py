@@ -37,8 +37,6 @@ class Lead(models.Model):
             date_deadline = False
             
             datos = activity._obtener_fechas(rec.stage_id.actividad_inicial)
-            logging.info('datos')
-            logging.info(datos)
             
             activity_ins = activity.create(
             {
