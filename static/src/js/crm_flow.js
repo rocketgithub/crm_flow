@@ -87,7 +87,7 @@ var setDelayLabel = function (activities,tipos_actividades){
                     toDisplay = _t("Tomorrow");
 
 
-                    if (activity.activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
+                    if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                         toDisplay = _t("Tomorrow") + _t(texto_horas);
                     }
 
@@ -95,7 +95,7 @@ var setDelayLabel = function (activities,tipos_actividades){
                 } else {
                     toDisplay = _.str.sprintf(_t("Due in %d days"), Math.abs(diff));
 
-                    if (activity.activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
+                    if (activity.activity_type_id[2] == 'horas' & (horas >= 1 || minutos >= 1)){
                         toDisplay = _.str.sprintf(_t("Due in %d days")+_t(texto_horas), Math.abs(diff));
                     }
 
