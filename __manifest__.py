@@ -21,8 +21,9 @@
         'views/crm_views.xml',
         'data/base_automation.xml',
         'views/templates.xml',
+        'security/ir.model.access.csv',
     ],
-    
+
     'qweb': [
         'static/src/xml/crm_flow.xml'
     ],
