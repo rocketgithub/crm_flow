@@ -20,9 +20,12 @@
             <field name="company_id" position="after">
                 <field name="tipo_interes_id"/>
             </field>
+            <button name="toggle_active" position="after">
+                <button name="agendar_cita" string="Agendar cita" type="object"/>
+            </button>
         </field>
     </record>
 
-    
+
 
 </odoo>
