@@ -14,12 +14,13 @@
     'category': 'Uncategorized',
     'version': '0.1',
 
-    'depends': ['base','crm','mail'],
+    'depends': ['base','crm','mail','sales_team'],
 
     'data': [
         'views/mail_activity_views.xml',
         'views/crm_views.xml',
         'data/base_automation.xml',
+        'views/crm_team_views.xml',
         'views/templates.xml',
         'security/ir.model.access.csv',
     ],
