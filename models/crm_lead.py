@@ -10,11 +10,11 @@ class Lead(models.Model):
     _inherit = 'crm.lead'
 
     tipo_interes_id = fields.Many2one('product.template', string='Tipo de interés')
-    
+
     def eval_dominio(self, dominio):
         domain = safe_eval(dominio)
         return domain
-    
+
     @api.model
     def create(self, vals):
         rec = super(Lead, self).create(vals)
@@ -35,9 +35,9 @@ class Lead(models.Model):
             base_fecha_sugerida =  fields.Date.context_today(rec)
             hoy = fields.Datetime.context_timestamp(rec, timestamp=datetime.now())
             date_deadline = False
-            
+
             datos = activity._obtener_fechas(rec.stage_id.actividad_inicial)
-            
+
             activity_ins = activity.create(
             {
             'res_id': oportunidad.id,
@@ -64,3 +64,21 @@ class Lead(models.Model):
                         logging.warn(posicion_estado_actual)
                         oportunidad_id.write({'stage_id': estado_ids[posicion_estado_actual+1]})
                         oportunidad_id._onchange_stage_crm_id()
+
+
+    def agendar_cita(self):
+        for oportunidad in self:
+            accion = {}
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            empleado_id = self.env['hr.employee'].search([('user_id','=', oportunidad.user_id.id)])
+            if empleado_id and oportunidad.team_id.tipo_cita_id.employee_ids:
+                website_url = False
+                for empleado in oportunidad.team_id.tipo_cita_id.employee_ids:
+                    if empleado.id == empleado_id.id:
+                        website_url = oportunidad.team_id.tipo_cita_id.website_url
+                        accion = {
+                            "type": "ir.actions.act_url",
+                            "url": str(base_url)+str(website_url)+'?employee_id='+str(empleado.id),
+                            "target": "new",
+                        }
+            return accion

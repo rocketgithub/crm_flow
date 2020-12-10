@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <odoo>
-    
+  
     <record id="crm_flow_actividad_correo" model="base.automation">
             <field name="name">Actividad de Enviar Correo</field>
             <field name="model_id" eval="ref('crm.model_crm_lead')"/>
@@ -21,9 +21,9 @@ if lead_id:
             </field>
         </record>
     
-    
+   
     <record id="crm_flow_cita_agendada" model="base.automation">
-            <field name="name">Cambiar oportunidad a cita agendadaaa</field>
+            <field name="name">Cambiar oportunidad a cita agendada</field>
             <field name="model_id" eval="ref('calendar.model_calendar_event')"/>
             <field name="state">code</field>
             <field name="trigger">on_create</field>
