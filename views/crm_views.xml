@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <field name="team_id" position="after">
                 <field name="actividad_inicial"/>
+                <field name="cita_agendada"/>
             </field>
         </field>
     </record>

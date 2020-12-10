@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <odoo>
-
-
+    
     <record id="crm_flow_actividad_correo" model="base.automation">
             <field name="name">Actividad de Enviar Correo</field>
             <field name="model_id" eval="ref('crm.model_crm_lead')"/>
@@ -21,7 +20,21 @@ if lead_id:
           plantilla.plantilla_id.send_mail(record.id, force_send=True, raise_exception=True)
             </field>
         </record>
-
-
+    
+    
+    <record id="crm_flow_cita_agendada" model="base.automation">
+            <field name="name">Cambiar oportunidad a cita agendada</field>
+            <field name="model_id" eval="ref('calendar.model_calendar_event')"/>
+            <field name="state">code</field>
+            <field name="trigger">on_create</field>
+            <field name="code">event_id = env['calendar.event'].search([('name','=',record.name)])
+if event_id:
+  if event_id.partner_ids:
+    stage_id = env['crm.stage'].search([('cita_agendada','=',True)])
+    lead_ids = env['crm.lead'].search([('partner_id','in',event_id.partner_ids.ids),('user_id','=',event_id.user_id.id)])
+    for lead in lead_ids:
+      lead.write({'stage_id': stage_id.id})
+            </field>
+        </record>
 
 </odoo>
