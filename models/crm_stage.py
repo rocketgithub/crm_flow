@@ -7,4 +7,5 @@ class Stage(models.Model):
     _inherit = 'crm.stage'
 
     actividad_inicial = fields.Many2one('mail.activity.type', string='Actividad Inicial')
+    cita_agendada = fields.Boolean('Cita Agendada')
 
