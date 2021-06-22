@@ -24,7 +24,6 @@ class Lead(models.Model):
     @api.onchange('stage_id')
     def _onchange_stage_crm_id(self):
         for rec in self:
-            logging.warn('entra a onchange')
             oportunidad = self.env['crm.lead'].browse(rec._origin.id)
             activity = self.env['mail.activity']
             model_id = self.env['ir.model'].search([('model','=','crm.lead')])
@@ -35,20 +34,19 @@ class Lead(models.Model):
             base_fecha_sugerida =  fields.Date.context_today(rec)
             hoy = fields.Datetime.context_timestamp(rec, timestamp=datetime.now())
             date_deadline = False
-
-            datos = activity._obtener_fechas(rec.stage_id.actividad_inicial)
-
-            activity_ins = activity.create(
-            {
-            'res_id': oportunidad.id,
-            'res_model_id': model_id.id,
-            'res_model':model_id.name,
-            'activity_type_id':rec.stage_id.actividad_inicial.id,
-            'date_deadline':  datos['date_deadline'],
-            'hora': datos['hora'],
-            'fecha_sugerida': datos['fecha_sugerida'],
-            'user_id': rec.user_id.id
-            })
+            if rec.stage_id.actividad_inicial:
+                datos = activity._obtener_fechas(rec.stage_id.actividad_inicial)
+                activity_ins = activity.create(
+                {
+                'res_id': oportunidad.id,
+                'res_model_id': model_id.id,
+                'res_model':model_id.name,
+                'activity_type_id':rec.stage_id.actividad_inicial.id,
+                'date_deadline':  datos['date_deadline'],
+                'hora': datos['hora'],
+                'fecha_sugerida': datos['fecha_sugerida'],
+                'user_id': rec.user_id.id
+                })
 
     def cambiar_estado(self,actividad):
         actividad_id = self.env['mail.activity'].search([('id','in',actividad)])
